@@ -21,8 +21,9 @@
         
         body {
             font-family: 'Noto Sans TC', sans-serif;
-            background-color: #f8f8f8;
+            background-color: #f4f1ea; /* 米杏色背景 */
             overflow-x: hidden;
+            color: #5c4a28; /* 深棕色文字 */
         }
 
         /* 品牌金色定義 */
@@ -36,18 +37,22 @@
         .border-brand-gold { border-color: #967740; }
 
         .kahoot-btn {
-            transition: all 0.1s ease-in-out;
-            box-shadow: 0 4px 0 rgba(0,0,0,0.1);
+            transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            border: 1px solid rgba(255,255,255,0.4);
         }
         .kahoot-btn:active {
-            transform: translateY(4px);
-            box-shadow: 0 0px 0 rgba(0,0,0,0.1);
+            transform: translateY(2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .kahoot-btn:hover {
+            filter: brightness(1.02);
         }
 
         .animate-pop-in {
             animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
             opacity: 0;
-            transform: scale(0.8);
+            transform: scale(0.95);
         }
 
         @keyframes popIn {
@@ -59,23 +64,10 @@
 
         .bg-pattern {
             /* 淡雅的紋理背景 */
-            background-color: #fdfbf7;
-            background-image: radial-gradient(#967740 0.5px, transparent 0.5px), radial-gradient(#967740 0.5px, #fdfbf7 0.5px);
-            background-size: 20px 20px;
-            background-position: 0 0, 10px 10px;
-            opacity: 1;
-        }
-        
-        /* 覆蓋部分背景使其更淡 */
-        .bg-pattern::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.92);
-            z-index: -1;
+            background-color: #f4f1ea;
+            background-image: radial-gradient(#d4c5a9 0.8px, transparent 0.8px), radial-gradient(#d4c5a9 0.8px, #f4f1ea 0.8px);
+            background-size: 24px 24px;
+            background-position: 0 0, 12px 12px;
         }
     </style>
 </head>
@@ -104,7 +96,7 @@
         );
 
         const Sparkles = (props) => (
-            <Icon {...props}><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" /></Icon>
+            <Icon {...props}><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L12 3Z" /></Icon>
         );
         const Moon = (props) => (
             <Icon {...props}><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" /></Icon>
@@ -129,6 +121,9 @@
                 <path d="M8 16H3v5" />
             </Icon>
         );
+        const ArrowLeft = (props) => (
+            <Icon {...props}><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></Icon>
+        );
 
         // --- Data Definitions ---
 
@@ -138,66 +133,103 @@
                 title: "第一區：我現在很累",
                 subtitle: "情緒安定・休息",
                 desc: "當生活把你消耗得很快，你需要的不是再多一點努力，而是一個可以暫時放下的地方。",
-                color: "bg-purple-50 text-purple-900 border-purple-200", // Lighter aesthetic
-                accent: "bg-purple-500",
+                color: "bg-[#f3eafa] text-[#6b4c9a] border-[#e0d0f0]", // Soft Lavender
+                accent: "bg-[#b39ddb]",
                 icon: <Moon size={40} />,
-                products: ["紫水晶碎石/手串/晶鎮", "白水晶系列 (淨化)", "拉長石/月光石 (溫柔修復)", "薰衣草紫晶", "天青石/透石膏"]
+                // 完整資料庫 - 休息/淨化/療癒 (紫、白、透明、溫柔系)
+                pool: [
+                    "烏拉圭帝王紫水晶", "紫水晶", "薰衣草紫晶", "夢幻紫晶", "紫晶簇", "紫晶方解", 
+                    "玻利維亞紫晶", "紫拉長石", "烏拉圭紫晶", "流沙紫鈦晶", "紫龍晶", "紫雲母",
+                    "喜瑪拉雅白水晶", "白水晶", "藍針白水晶", "阿賽斯特萊", "白阿賽水晶", "水膽水晶",
+                    "拉長石", "藍拉長石", "拉利瑪", "月光石", "白月光", "馬島月光", "銀月光", "綠月光", "橙月光",
+                    "天青石", "透石膏", "貴州氟鋁石膏", "魚眼石輝沸石", "印度沸石",
+                    "葡萄石", "紫鋰輝", "藍紫鋰輝", "櫻花舒俱萊", "舒俱萊", "藥王石", 
+                    "七彩螢石", "羽毛螢石", "糖果螢石", "紫螢石", "綠螢石", "藍螢石", "雙色螢石", "藍紋瑪瑙",
+                    "閃靈鑽", "水膽閃靈", "白兔毛", 
+                    "余太翠", "岫玉", "漢白玉"
+                ]
             },
             career: {
                 id: 2,
                 title: "第二區：我想往前走",
                 subtitle: "行動力・事業・轉換",
                 desc: "卡住的時候，不是方向錯，而是能量不夠。當你願意跨出第一步，事情才會開始流動。",
-                color: "bg-yellow-50 text-yellow-900 border-yellow-200",
-                accent: "bg-yellow-500",
+                color: "bg-[#fff8e1] text-[#8d6e3f] border-[#faeabb]", // Soft Cream/Yellow
+                accent: "bg-[#ffe082]",
                 icon: <Zap size={40} />,
-                products: ["黃水晶/鈦晶 (招財)", "綠幽靈/異象水晶", "超級七/極光23 (高頻)", "太陽石/金髮晶", "碧璽/黃銅礦"]
+                // 完整資料庫 - 事業/招財/行動力 (黃、金、紅、高頻系)
+                pool: [
+                    "黃水晶", "檸檬黃阿賽", "鈦晶", "咖啡鈦晶", "金髮晶", "銅髮晶",
+                    "黑金超七", "紫粉超七", "金草莓超七", "超級七", "彩色超七", 
+                    "極光23", "惡魔之眼極光23", "阿魯沙", "九紫離火水晶",
+                    "綠幽靈", "四季幽靈", "藍幽靈", "綠幽共生雲母兔毛", "異象水晶", "巴西異象",
+                    "太陽石", "金太陽", "金草莓太陽石", "黃銅礦", "斑彩石",
+                    "黃膠花", "牛血紅膠花", "紅膠花",
+                    "紅兔毛", "黃兔毛", "橘兔毛", "綠兔毛", "彩兔毛", "莫蘭迪色兔毛",
+                    "碧璽", "老礦碧璽", "財寶舍利", "年輪魚子舍利", "釩鉛礦", "琥珀", "藍珀",
+                    "黃虎眼", "紅虎眼", "三色虎眼", "閃電虎眼", "彼得石", "黃螢石"
+                ]
             },
             love: {
                 id: 3,
                 title: "第三區：我需要好好相處",
                 subtitle: "人際・感情・溝通",
                 desc: "在關係裡，你不需要委屈自己。你只需要被聽懂、被理解。",
-                color: "bg-pink-50 text-pink-900 border-pink-200",
-                accent: "bg-pink-500",
+                color: "bg-[#fce4ec] text-[#ad4b76] border-[#f8bbd0]", // Soft Rose
+                accent: "bg-[#f48fb1]",
                 icon: <Heart size={40} />,
-                products: ["粉水晶 (人緣/桃花)", "草莓晶/紅紋石", "海藍寶/藍晶石 (溝通)", "天河石", "摩根石/孔雀石"]
+                // 完整資料庫 - 愛情/人緣/溝通 (粉、紅、藍、青系)
+                pool: [
+                    "粉水晶", "馬粉", "雲霧粉水晶", "西柚粉晶", "六芒星粉晶",
+                    "草莓晶", "綠草莓晶", "金草莓半盆超七", "薔薇輝石", "玉化紅紋石", "摩根石",
+                    "海藍寶", "魔鬼海藍寶", "海藍寶共生方解石", "藍玉髓",
+                    "藍晶石", "天河石", "彩天河石", "藍磷灰", "矽孔雀石藍銅礦", "孔雀石", "綠孔雀石",
+                    "堇青石", "彩寶水晶", "鹽源瑪瑙", "女王貝", "蛋白石", "粉澳寶",
+                    "藍兔毛"
+                ]
             },
             protect: {
                 id: 4,
                 title: "第四區：我想保護自己",
                 subtitle: "界線・防護・穩定",
                 desc: "當外界太吵、情緒太多，為自己留下一點空間，是一種溫柔的保護。",
-                color: "bg-slate-100 text-slate-800 border-slate-300",
-                accent: "bg-slate-600",
+                color: "bg-[#eff1f3] text-[#546e7a] border-[#cfd8dc]", // Soft Blue-Grey
+                accent: "bg-[#90a4ae]",
                 icon: <Shield size={40} />,
-                products: ["黑曜石/金曜石/銀曜石", "黑髮晶/黑碧璽", "金運石 (強力避邪)", "茶晶 (穩定落地)", "青金石/硃砂"]
+                // 完整資料庫 - 避邪/防護/穩定 (黑、深藍、落地系)
+                pool: [
+                    "黑曜石", "彩虹黑曜石", "金曜石", "銀曜石", "雪花黑曜石", 
+                    "黑髮晶", "黑碧璽", "金運石", 
+                    "茶水晶", "黑膽石", "阿拉善瑪瑙", "南紅瑪瑙", "紅瑪瑙", "纏絲紅瑪瑙",
+                    "青金石", "藍紋石", 
+                    "硃砂", "帝王硃砂", "天鐵", "瑞典天鐵", "鈦赫茲", 
+                    "黑閃靈", "龍血石", "火焰石", "異極礦", "灰兔毛"
+                ]
             }
         };
 
-        // Note: Keeping option colors (Red/Blue/Yellow/Green) distinct as they are functional for the quiz mechanics
         const questions = [
             {
                 step: 1,
                 question: "STEP 1｜閉上眼睛深呼吸... 你現在最想調整的狀態是？",
                 type: "poll",
                 options: [
-                    { text: "焦慮、腦袋停不下來", type: "rest", color: "bg-red-500" },
-                    { text: "睡不好、容易累", type: "rest", color: "bg-blue-500" },
-                    { text: "人際或感情很消耗", type: "love", color: "bg-yellow-500" },
-                    { text: "事業卡關 / 金錢壓力", type: "career", color: "bg-green-600" }
+                    { text: "焦慮、腦袋停不下來", type: "rest", color: "bg-[#dcb5ac]" }, // Dusty Rose
+                    { text: "睡不好、容易累", type: "rest", color: "bg-[#a6b6c3]" }, // Dusty Blue
+                    { text: "人際或感情很消耗", type: "love", color: "bg-[#dfcc9f]" }, // Sand/Gold
+                    { text: "事業卡關 / 金錢壓力", type: "career", color: "bg-[#aebfa1]" } // Sage Green
                 ],
-                extraOption: { text: "容易被外界影響、磁場亂", type: "protect", color: "bg-slate-500" } 
+                extraOption: { text: "容易被外界影響、磁場亂", type: "protect", color: "bg-[#b7b0a8]" } // Warm Grey
             },
             {
                 step: 2,
                 question: "STEP 2｜目前這個狀況影響你多深？",
                 type: "poll",
                 options: [
-                    { text: "偶爾影響 (最近才開始)", score: 1, color: "bg-red-500" },
-                    { text: "已影響情緒與判斷", score: 2, color: "bg-blue-500" },
-                    { text: "長期狀態，很想改變", score: 3, color: "bg-yellow-500" },
-                    { text: "只是隨緣逛逛", score: 0, color: "bg-green-600" }
+                    { text: "偶爾影響 (最近才開始)", score: 1, color: "bg-[#dcb5ac]" },
+                    { text: "已影響情緒與判斷", score: 2, color: "bg-[#a6b6c3]" },
+                    { text: "長期狀態，很想改變", score: 3, color: "bg-[#dfcc9f]" },
+                    { text: "只是隨緣逛逛", score: 0, color: "bg-[#aebfa1]" }
                 ]
             },
             {
@@ -205,10 +237,10 @@
                 question: "STEP 3｜如果有水晶夥伴，你希望它帶給你什麼感覺？",
                 type: "poll",
                 options: [
-                    { text: "情緒穩定、心比較靜", type: "rest", color: "bg-red-500" },
-                    { text: "事情順一點、行動力", type: "career", color: "bg-blue-500" },
-                    { text: "人際磁場改善", type: "love", color: "bg-yellow-500" },
-                    { text: "被保護、比較安心", type: "protect", color: "bg-green-600" }
+                    { text: "情緒穩定、心比較靜", type: "rest", color: "bg-[#dcb5ac]" },
+                    { text: "事情順一點、行動力", type: "career", color: "bg-[#a6b6c3]" },
+                    { text: "人際磁場改善", type: "love", color: "bg-[#dfcc9f]" },
+                    { text: "被保護、比較安心", type: "protect", color: "bg-[#aebfa1]" }
                 ]
             },
             {
@@ -216,10 +248,10 @@
                 question: "STEP 4｜你通常習慣怎麼使用飾品？",
                 type: "poll",
                 options: [
-                    { text: "每天佩戴", val: "daily", color: "bg-red-500" },
-                    { text: "偶爾佩戴", val: "occasional", color: "bg-blue-500" },
-                    { text: "放包包 / 床邊 / 桌上", val: "place", color: "bg-yellow-500" },
-                    { text: "還不確定", val: "unsure", color: "bg-green-600" }
+                    { text: "每天佩戴", val: "daily", color: "bg-[#dcb5ac]" },
+                    { text: "偶爾佩戴", val: "occasional", color: "bg-[#a6b6c3]" },
+                    { text: "放包包 / 床邊 / 桌上", val: "place", color: "bg-[#dfcc9f]" },
+                    { text: "還不確定", val: "unsure", color: "bg-[#aebfa1]" }
                 ]
             },
             {
@@ -227,10 +259,10 @@
                 question: "STEP 5｜今天，你準備好為自己做多少改變？(預算)",
                 type: "poll",
                 options: [
-                    { text: "先穩定就好 ($680 入門)", val: "680", color: "bg-red-500" },
-                    { text: "穩定＋推進 ($980 進階)", val: "980", color: "bg-blue-500" },
-                    { text: "一次調整到位 ($1280 完整)", val: "1280", color: "bg-yellow-500" },
-                    { text: "顧問協助 / 客製化", val: "custom", color: "bg-green-600" }
+                    { text: "先穩定就好 ($680 入門)", val: "680", color: "bg-[#dcb5ac]" },
+                    { text: "穩定＋推進 ($980 進階)", val: "980", color: "bg-[#a6b6c3]" },
+                    { text: "一次調整到位 ($1280 完整)", val: "1280", color: "bg-[#dfcc9f]" },
+                    { text: "顧問協助 / 客製化", val: "custom", color: "bg-[#aebfa1]" }
                 ]
             }
         ];
@@ -239,50 +271,61 @@
 
         const WelcomeScreen = ({ onStart }) => (
             <div className="flex flex-col items-center justify-center min-h-screen bg-pattern p-6 text-center animate-pop-in relative z-10">
-                <div className="bg-white p-8 rounded-3xl shadow-xl max-w-md w-full border-b-8 border-[#967740]">
+                <div className="bg-white/80 backdrop-blur-md p-8 rounded-3xl shadow-xl max-w-md w-full border border-white">
                     <div className="mb-6 flex justify-center text-[#967740]">
                         <Sparkles size={64} />
                     </div>
-                    <h1 className="text-3xl font-black text-gray-800 mb-4 tracking-tight">
-                        騏藝逸品<br/><span className="text-[#967740] text-2xl">靈魂狀態檢測</span>
+                    <h1 className="text-3xl font-black text-[#5c4a28] mb-4 tracking-tight">
+                        騏藝逸品<br/><span className="text-[#967740] text-2xl font-bold">靈魂狀態檢測</span>
                     </h1>
-                    <p className="text-gray-600 mb-8 font-medium leading-relaxed">
+                    <p className="text-[#8d6e3f] mb-8 font-medium leading-relaxed">
                         花 1 分鐘，讓我們幫你找到現在最需要的水晶夥伴，補充你缺失的能量。
                     </p>
                     <button 
                         onClick={onStart}
-                        className="w-full bg-[#967740] text-white text-xl font-bold py-4 rounded-xl shadow-lg hover:bg-[#7a6030] transition-transform active:scale-95 border-b-4 border-[#7a6030]"
+                        className="w-full bg-[#967740] text-white text-xl font-bold py-4 rounded-xl shadow-md hover:bg-[#856730] transition-all transform hover:-translate-y-1"
                     >
                         開始測驗
                     </button>
-                    <p className="mt-4 text-xs text-gray-400 tracking-widest">QI YI CRYSTAL</p>
+                    <p className="mt-6 text-xs text-[#b0a286] tracking-widest font-bold">QI YI CRYSTAL</p>
                 </div>
             </div>
         );
 
-        const QuestionScreen = ({ questionData, onAnswer, currentStep, totalSteps }) => {
+        const QuestionScreen = ({ questionData, onAnswer, onBack, currentStep, totalSteps }) => {
             const displayOptions = questionData.step === 1 
                 ? [...questionData.options, questionData.extraOption]
                 : questionData.options;
 
             return (
-                <div className="flex flex-col min-h-screen bg-[#967740] text-white">
+                <div className="flex flex-col min-h-screen bg-[#f4f1ea] text-[#5c4a28]">
                     {/* Header Bar */}
-                    <div className="flex justify-between items-center p-4 bg-black/10">
-                        <div className="bg-white/20 px-4 py-1 rounded-full text-sm font-bold backdrop-blur-sm">
+                    <div className="flex justify-between items-center p-4 relative">
+                        {/* Back Button */}
+                        <button 
+                            onClick={onBack}
+                            className="p-2 rounded-full hover:bg-[#e4dac6] transition-colors text-[#967740] flex items-center gap-1"
+                            title="返回上一題"
+                        >
+                            <ArrowLeft size={24} />
+                        </button>
+
+                        <div className="bg-[#e4dac6] text-[#967740] px-4 py-1 rounded-full text-sm font-bold absolute left-1/2 transform -translate-x-1/2">
                             {currentStep} / {totalSteps}
                         </div>
-                        <div className="font-bold tracking-wider opacity-90">QI YI CRYSTAL</div>
+                        
+                        {/* Spacer */}
+                        <div className="w-10"></div> 
                     </div>
 
                     {/* Question Area */}
                     <div className="flex-1 flex items-center justify-center p-6 text-center">
-                        <div className="bg-white text-gray-900 p-8 rounded-2xl shadow-2xl max-w-2xl w-full border-b-8 border-[#d4c5a9] animate-pop-in">
-                            <h2 className="text-2xl md:text-3xl font-black text-[#5c4a28]">{questionData.question}</h2>
+                        <div className="bg-white p-8 rounded-2xl shadow-sm max-w-2xl w-full border border-[#e8dfcc] animate-pop-in">
+                            <h2 className="text-2xl md:text-3xl font-bold text-[#5c4a28] tracking-wide leading-relaxed">{questionData.question}</h2>
                         </div>
                     </div>
 
-                    {/* Options Area (Kahoot Style Grid) */}
+                    {/* Options Area (Kahoot Style Grid but softer) */}
                     <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4 pb-8 max-w-4xl mx-auto w-full">
                         {displayOptions.map((opt, idx) => (
                             <button
@@ -291,15 +334,14 @@
                                 className={`
                                     ${opt.color} 
                                     kahoot-btn
-                                    text-white text-lg md:text-xl font-bold 
-                                    p-6 md:p-8 rounded-xl shadow-md 
+                                    text-[#4a3b22] text-lg md:text-xl font-bold 
+                                    p-6 md:p-8 rounded-xl
                                     flex items-center justify-between
-                                    border-b-4 border-black/20
                                     ${questionData.step === 1 && idx === 4 ? 'md:col-span-2' : ''} 
                                 `}
                             >
                                 <div className="flex items-center gap-3 text-left w-full">
-                                    <span className="bg-black/20 w-8 h-8 flex items-center justify-center rounded text-sm shrink-0">
+                                    <span className="bg-black/10 w-8 h-8 flex items-center justify-center rounded text-sm shrink-0 text-[#4a3b22]">
                                         {idx === 0 ? '▲' : idx === 1 ? '◆' : idx === 2 ? '●' : idx === 3 ? '■' : '★'}
                                     </span>
                                     <span>{opt.text}</span>
@@ -313,6 +355,18 @@
 
         const ResultScreen = ({ result, userSelections, onRestart }) => {
             const sectionData = sections[result];
+            const [recommendations, setRecommendations] = useState([]);
+
+            // Randomly select 5 items on mount
+            useEffect(() => {
+                const pool = sectionData.pool;
+                if (pool && pool.length > 0) {
+                    // Shuffle array
+                    const shuffled = [...pool].sort(() => 0.5 - Math.random());
+                    // Pick first 5
+                    setRecommendations(shuffled.slice(0, 5));
+                }
+            }, [result]); // Re-run if result changes (though component usually unmounts)
 
             // Determine intensity
             const intensity = userSelections.q2_score >= 2 ? "能量急需補充" : "能量微調保養";
@@ -327,27 +381,27 @@
             const userBudget = budgetMap[userSelections.budget] || "未定";
 
             return (
-                <div className="min-h-screen bg-[#fdfbf7] p-4 md:p-8 flex items-center justify-center">
-                    <div className="max-w-4xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row animate-pop-in border border-[#e8dfcc]">
+                <div className="min-h-screen bg-[#f4f1ea] p-4 md:p-8 flex items-center justify-center">
+                    <div className="max-w-4xl w-full bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col md:flex-row animate-pop-in border border-[#e8dfcc]">
                         
                         {/* Left Side: Result Card */}
                         <div className={`md:w-5/12 p-8 flex flex-col justify-between relative overflow-hidden ${sectionData.color}`}>
                             
                             <div className="relative z-10">
-                                <div className="inline-block px-3 py-1 bg-white/60 rounded-full text-xs font-bold mb-4 tracking-widest uppercase text-gray-600">
+                                <div className="inline-block px-3 py-1 bg-white/50 rounded-full text-xs font-bold mb-4 tracking-widest uppercase opacity-80">
                                     Your Energy Analysis
                                 </div>
                                 <h2 className="text-4xl font-black mb-2 tracking-tight">{sectionData.title}</h2>
-                                <h3 className="text-xl font-medium opacity-80 mb-6">{sectionData.subtitle}</h3>
-                                <div className="bg-white/40 p-4 rounded-xl backdrop-blur-sm border border-white/50 mb-6">
-                                    <p className="text-sm leading-relaxed font-medium">
+                                <h3 className="text-xl font-bold opacity-80 mb-6">{sectionData.subtitle}</h3>
+                                <div className="bg-white/40 p-4 rounded-xl backdrop-blur-sm border border-white/40 mb-6">
+                                    <p className="text-sm leading-relaxed font-medium opacity-90">
                                         "{sectionData.desc}"
                                     </p>
                                 </div>
                             </div>
                             
                             <div className="relative z-10 text-center mt-4">
-                                <div className={`bg-white p-4 rounded-full inline-block shadow-lg mb-2 text-[#967740]`}>
+                                <div className={`bg-white p-4 rounded-full inline-block shadow-sm mb-2 text-[#967740]`}>
                                     {sectionData.icon}
                                 </div>
                                 <div className="font-bold text-lg opacity-80">檢測結果</div>
@@ -355,7 +409,7 @@
                         </div>
 
                         {/* Right Side: Details & Action */}
-                        <div className="md:w-7/12 p-8 bg-white text-gray-800 flex flex-col">
+                        <div className="md:w-7/12 p-8 bg-white text-[#5c4a28] flex flex-col">
                             
                             {/* Consultant Note (Top Info) */}
                             <div className="bg-[#fcfbf9] rounded-xl p-4 mb-6 border border-[#e8dfcc]">
@@ -363,7 +417,7 @@
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
                                         <span className="block text-xs text-gray-400">當前狀態強度</span>
-                                        <span className={`block font-bold ${userSelections.q2_score >= 2 ? 'text-red-500' : 'text-gray-600'}`}>
+                                        <span className={`block font-bold ${userSelections.q2_score >= 2 ? 'text-[#dcb5ac]' : 'text-[#a6b6c3]'}`}>
                                             {intensity}
                                         </span>
                                     </div>
@@ -374,16 +428,16 @@
                                 </div>
                             </div>
 
-                            {/* Recommendations */}
+                            {/* Recommendations (Random 5) */}
                             <div className="flex-1">
-                                <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-gray-800">
-                                    <Star className="text-[#967740]" size={20}/> 推薦水晶品項
+                                <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-[#5c4a28]">
+                                    <Star className="text-[#dfcc9f]" size={20}/> 專屬推薦水晶
                                 </h3>
                                 <ul className="space-y-3 mb-8">
-                                    {sectionData.products.map((prod, idx) => (
-                                        <li key={idx} className="flex items-start gap-3 p-3 rounded-lg hover:bg-[#fdfbf7] transition-colors border border-transparent hover:border-[#e8dfcc]">
+                                    {recommendations.map((prod, idx) => (
+                                        <li key={idx} className="flex items-start gap-3 p-3 rounded-lg hover:bg-[#f9f7f2] transition-colors border border-transparent hover:border-[#e8dfcc] animate-pop-in" style={{animationDelay: `${idx * 0.1}s`}}>
                                             <div className={`mt-1 w-2 h-2 rounded-full shrink-0 ${sectionData.accent}`}></div>
-                                            <span className="font-medium text-gray-600">{prod}</span>
+                                            <span className="font-medium text-[#7d6745]">{prod}</span>
                                         </li>
                                     ))}
                                 </ul>
@@ -391,12 +445,12 @@
 
                             {/* CTA Button */}
                             <div className="mt-auto pt-4 border-t border-gray-100">
-                                <p className="text-center text-sm text-gray-400 mb-4">
+                                <p className="text-center text-sm text-[#b0a286] mb-4">
                                     請將此畫面出示給現場顧問，我們將引導您前往該區域。
                                 </p>
                                 <button 
                                     onClick={onRestart}
-                                    className="w-full flex items-center justify-center gap-2 bg-[#967740] text-white font-bold py-3 rounded-xl hover:bg-[#7a6030] transition-colors shadow-lg"
+                                    className="w-full flex items-center justify-center gap-2 bg-[#967740] text-white font-bold py-3 rounded-xl hover:bg-[#856730] transition-colors shadow-md"
                                 >
                                     <RefreshCw size={18} /> 重新測驗
                                 </button>
@@ -424,6 +478,17 @@
                 setScreen('quiz');
                 setCurrentQIndex(0);
                 setAnswers({ mainType: null, q2_score: 0, desiredType: null, habit: null, budget: null });
+            };
+
+            // Back Handler
+            const handleBack = () => {
+                if (currentQIndex > 0) {
+                    // Go back to previous question
+                    setCurrentQIndex(prev => prev - 1);
+                } else {
+                    // Go back to welcome screen if on first question
+                    setScreen('welcome');
+                }
             };
 
             const handleAnswer = (option) => {
@@ -455,12 +520,13 @@
             };
 
             return (
-                <div className="antialiased text-gray-900">
+                <div className="antialiased text-[#5c4a28]">
                     {screen === 'welcome' && <WelcomeScreen onStart={handleStart} />}
                     {screen === 'quiz' && (
                         <QuestionScreen 
                             questionData={questions[currentQIndex]} 
                             onAnswer={handleAnswer}
+                            onBack={handleBack} 
                             currentStep={currentQIndex + 1}
                             totalSteps={questions.length}
                         />
