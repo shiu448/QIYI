@@ -96,6 +96,14 @@
         const ArrowLeft = (props) => (<Icon {...props}><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></Icon>);
         const Info = (props) => (<Icon {...props}><circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="12" /><line x1="12" y1="8" x2="12.01" y2="8" /></Icon>);
         const X = (props) => (<Icon {...props}><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></Icon>);
+        
+        // New Moon Icon for Welcome Screen (Replaces CrystalIcon)
+        const MoonIconCustom = (props) => (
+            <Icon {...props}>
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                <path d="M15 9l.5 1.5 1.5.5-1.5.5-.5 1.5-.5-1.5-1.5-.5 1.5-.5z" />
+            </Icon>
+        );
 
         // --- Helper: Get Crystal Info by Name ---
         const getCrystalInfo = (name) => {
@@ -103,45 +111,125 @@
             let placement = "適合隨身佩戴，讓水晶能量時刻陪伴。";
             let isOrnament = false;
 
-            // 1. Determine Shape/Placement first (Hierarchy: Specific Shapes -> General Ornaments -> Wearables)
-            if (name.includes("龍龜") || name.includes("貔貅") || name.includes("蟾蜍")) {
-                placement = "【招財神獸】建議將頭部朝向門口或窗外，以吸納財氣、鎮宅化煞。";
+            // 1. Determine Shape/Placement first
+            if (name.includes("龍龜") || name.includes("貔貅") || name.includes("蟾蜍") || name.includes("狐") || name.includes("九尾")) {
+                placement = "【靈性神獸】建議將頭部朝向門口或窗外，以吸納財氣、鎮宅化煞；狐仙類則適合隨身或置於臥室。";
                 isOrnament = true;
-            } else if (name.includes("晶鎮") || name.includes("晶洞") || name.includes("錢袋") || name.includes("樹") || name.includes("聚寶盆")) {
-                placement = "【聚氣納財】適合擺放於家中財位（進門對角線45度角）或辦公桌上。";
+            } else if (name.includes("晶鎮") || name.includes("晶洞") || name.includes("錢袋") || name.includes("樹") || name.includes("聚寶盆") || name.includes("共生方解") || name.includes("簇") || name.includes("擺件")) {
+                placement = "【聚氣納財】適合擺放於家中財位（進門對角線45度角）或辦公桌上，聚集能量。";
                 isOrnament = true;
             } else if (name.includes("球") || name.includes("蛋")) {
                 placement = "【圓滿和諧】適合擺放於辦公桌（象徵圓融）或客廳顯眼處，有求必應。";
                 isOrnament = true;
-            } else if (name.includes("柱") || name.includes("塔") || name.includes("金字塔")) {
+            } else if (name.includes("柱") || name.includes("塔") || name.includes("金字塔") || name.includes("文昌")) {
                 placement = "【發射能量】適合放在辦公桌左前方（青龍方）或書桌，幫助集中精神與突破。";
                 isOrnament = true;
-            } else if (name.includes("盤") || name.includes("磚") || name.includes("原礦") || name.includes("擺件") || name.includes("畫框")) {
+            } else if (name.includes("盤") || name.includes("磚") || name.includes("原礦") || name.includes("畫框")) {
                 placement = "【能量淨化】適合放置飾品進行消磁，或置於床頭/書桌作為能量擺件。";
                 isOrnament = true;
             } else if (name.includes("愛心")) {
                  placement = "【情感流動】適合放在床頭櫃或梳妝台，增進感情與自我療癒。";
                  isOrnament = true;
+            } else if (name.includes("筆")) {
+                 placement = "【智慧與學業】適合隨身攜帶或放置於筆筒、書桌，提升考運與思緒。";
+                 isOrnament = true;
+            } else if (name.includes("漢白玉") || name.includes("余太翠") || name.includes("岫玉") || name.includes("印度沸石") || name.includes("天青石")) {
+                 placement = "【溫潤擺件】適合擺放於客廳、玄關或書房，能鎮宅避邪，同時以溫潤的能量滋養空間氣場。";
+                 isOrnament = true;
             }
 
-            // 2. Determine Effect based on Keyword
-            if (name.includes("紫") || name.includes("薰衣草") || name.includes("阿梅")) {
+            // 2. Determine Effect based on Specific Mineral Characteristics
+            
+            // --- Specific & Dual-Zone Stones (Priority) ---
+            if (name.includes("金運石")) {
+                effect = "【極致招財與避邪】被稱為「幸運之石」，黑色帶金屬光澤，對應海底輪與太陽輪，能強力招財，同時阻擋負能量與小人，是職場上的強力後盾。";
+                if (!isOrnament) placement = "建議佩戴於左手招財、右手避邪，或作為職場護身符。";
+            } else if (name.includes("琥珀") || name.includes("藍珀")) {
+                effect = "【安神與自信】佛教七寶之一，對應太陽輪，能穩定心神、安魂定魄、避邪保平安，同時其溫暖能量能增強自信與自我肯定，消除恐懼。";
+            }
+            
+            // --- Special Blue Stones ---
+            else if (name.includes("藍磷灰")) {
+                effect = "【激發與清理】對應喉輪，能清理氣場中的混亂與冷漠，激發積極性與創意，幫助你更誠實地表達自我。";
+            } else if (name.includes("藍兔毛")) {
+                effect = "【溫柔溝通】含有細密髮絲狀礦物，能增加說服力，同時撫平焦躁情緒，讓溝通表達變得溫柔且順暢。";
+            } else if (name.includes("藍玉髓")) {
+                effect = "【排解負能】古老的護身符，對應喉輪，能排解內心的恐懼與憤怒，阻隔負能量侵擾，帶來深層的寧靜。";
+            } else if (name.includes("魔鬼海藍寶")) {
+                effect = "【威嚴與自信】深邃的藍色能量，比一般海藍寶更具威嚴感，能強化領導自信與話語權，適合需要建立權威的溝通者。";
+            } 
+            
+            // --- Rabbit Hair (Rutilated Quartz) Series ---
+            else if (name.includes("紅兔毛")) {
+                effect = "【活力與自信】對應海底輪，細密的紅色髮絲能增強生命力與自信，調整氣血，適合女性佩戴。";
+            } else if (name.includes("黃兔毛")) {
+                effect = "【溫和招財】黃色對應太陽輪，不同於鈦晶的霸氣，黃兔毛以溫潤的方式招來財運，增強企圖心。";
+            } else if (name.includes("綠兔毛")) {
+                effect = "【事業機遇】綠色對應心輪，有助於事業發展，招來貴人與好機會，同時舒緩工作壓力。";
+            } else if (name.includes("白兔毛")) {
+                effect = "【光明與記憶】白色對應頂輪，能啟發智慧，增強記憶力，如白光般照亮思緒。";
+            } else if (name.includes("灰兔毛")) {
+                effect = "【防護與轉運】灰色系能化解負能量，消除晦氣，幫助佩戴者從低潮中轉運。";
+            }
+            // --- Fluorite Series ---
+            else if (name.includes("羽毛螢石")) {
+                effect = "【輕盈思緒】獨特的羽毛狀紋路，能像羽毛般掃除大腦的沈重負擔，帶來靈感與輕盈的思考。";
+            } else if (name.includes("糖果螢石") || name.includes("七彩螢石")) {
+                effect = "【平衡與清理】多種顏色的螢石能同時對應多個脈輪，幫助清理混亂思緒，恢復能量場的平衡。";
+            } else if (name.includes("紫螢石")) {
+                effect = "【專注與靈性】對應頂輪，特別有助於深層思考、提升直覺力，適合需要大量用腦的人。";
+            } else if (name.includes("黃螢石")) {
+                effect = "【修補與合作】有助於修補人際關係，增進團隊合作的默契，帶來意外的財運。";
+            }
+            // --- Specific Stones ---
+            else if (name.includes("九紫離火")) {
+                effect = "【靈性覺醒】應運九紫離火運而生，能清理深層意識的阻礙，在變動的大環境中，為你守住內心的清明與智慧。";
+            } else if (name.includes("火焰石")) {
+                effect = "【點燃熱情】看似低調的岩石，在特定光線下透出火焰般的光芒，能激發內心的熱情與潛能，增強行動力。";
+            } else if (name.includes("彼得石")) {
+                effect = "【王者風範】被稱為「暴風雨寶石」，能開發個人潛能，帶來勇氣與無畏的精神，像王者般面對挑戰。";
+            } else if (name.includes("龍血石") || name.includes("綠龍晶")) {
+                effect = "【生命力與勇氣】促進血液循環的意象，增強體力與生命力，激發面對困難的勇氣與韌性。";
+            } else if (name.includes("舒俱萊")) {
+                effect = "【因果與療癒】頂級的療癒之石，能轉化沈重的負能量，幫助靈性提升，達到深層的淨化與平衡。";
+            } else if (name.includes("阿賽斯特萊") || name.includes("白阿賽")) {
+                effect = "【高頻覺醒】擁有極高的振動頻率，能快速連結高層次意識，強力淨化身心與環境磁場。";
+            } else if (name.includes("天鐵") || name.includes("瑞典天鐵")) {
+                effect = "【宇宙能量】來自外太空的隕石，擁有強大的防護場，能打通氣脈，快速補充人體能量。";
+            } else if (name.includes("硃砂")) {
+                effect = "【極陽鎮煞】傳統避邪聖物，擁有極強的陽氣，能鎮靜安神，化解煞氣，保佑平安。";
+            } else if (name.includes("舍利")) {
+                effect = "【福報與護佑】具有特殊的磁場，能增長智慧，帶來吉祥與護佑，穩定心神。";
+            } else if (name.includes("余太翠") || name.includes("岫玉") || name.includes("漢白玉")) {
+                effect = "【溫潤養人】玉石類的溫潤能量，能平衡正負能量，長期擺放能滋養環境，消除浮躁。";
+            } else if (name.includes("異極礦")) {
+                effect = "【樂觀與提升】能帶來快樂與樂觀的能量，提升自我價值感，同時促進溝通與表達。";
+            } else if (name.includes("印度沸石")) {
+                effect = "【吸附與淨化】像海綿一樣吸附環境中的負能量與壓力，是極佳的空間淨化擺件。";
+            } else if (name.includes("天青石")) {
+                effect = "【寧靜與連結】如天空般清澈的能量，能帶來深層的平靜，幫助連結靈性與天使能量。";
+            } else if (name.includes("膠花")) {
+                effect = "【開運與轉變】水晶內部共生礦物質呈現花狀，象徵花開富貴，能帶來轉運的契機與新希望。";
+            }
+            // --- General Categories (Fallback) ---
+            else if (name.includes("紫") || name.includes("薰衣草")) {
                 effect = "【智慧與安定】對應頂輪，幫助大腦放鬆、提升睡眠品質，也能招來貴人運。";
                 if (isOrnament && !placement.includes("財位")) placement = "非常適合擺放在床頭（助眠）或書桌（專注）。";
-            } else if (name.includes("黃") || name.includes("鈦") || name.includes("金") || name.includes("琥珀") || name.includes("銅")) {
+            } else if (name.includes("黃") || name.includes("鈦") || name.includes("金") || name.includes("銅")) {
                 effect = "【財富與自信】對應太陽輪，增強自信心、行動力，主招正財與偏財。";
                 if (isOrnament) placement = "強烈建議擺放於財位（進門對角線45度角）或辦公桌。";
             } else if (name.includes("粉") || name.includes("草莓") || name.includes("紅紋") || name.includes("薔薇") || name.includes("摩根")) {
                 effect = "【愛情與人緣】對應心輪，療癒情感創傷，增加個人魅力，招來好人緣與桃花。";
-            } else if (name.includes("黑") || name.includes("茶") || name.includes("墨") || name.includes("朱砂") || name.includes("鐵") || name.includes("膽")) {
+            } else if (name.includes("黑") || name.includes("茶") || name.includes("墨") || name.includes("鐵") || name.includes("膽") || name.includes("煙晶")) {
                 effect = "【避邪與防護】對應海底輪，能吸收負能量、防小人，提供強大的安全感與結界。";
                 if (!isOrnament) placement = "建議佩戴於右手（排出負能量），或作為護身符。";
-                if (name.includes("朱砂")) effect += " (硃砂具有極強的鎮煞避邪傳統功效)";
-            } else if (name.includes("白") || name.includes("透") || name.includes("閃靈") || name.includes("阿賽")) {
+            } else if (name.includes("白") || name.includes("透") || name.includes("魚眼") || name.includes("石膏")) {
                 effect = "【淨化與專注】能淨化磁場、清除雜念，提升專注力與直覺，放大其他水晶能量。";
-            } else if (name.includes("綠") || name.includes("幽靈") || name.includes("孔雀") || name.includes("捷克") || name.includes("葡萄") || name.includes("橄欖")) {
-                effect = "【事業與正財】對應心輪與事業，帶來工作上的機遇，幫助緩解壓力與焦慮。";
-            } else if (name.includes("藍") || name.includes("青") || name.includes("海藍") || name.includes("天河") || name.includes("拉利瑪")) {
+            } else if (name.includes("閃靈")) {
+                effect = "【高頻淨化】被稱為「淨化之王」，能快速清理負能量，提升直覺與靈性。";
+            } else if (name.includes("綠") || name.includes("幽靈") || name.includes("孔雀") || name.includes("捷克") || name.includes("葡萄") || name.includes("橄欖") || name.includes("東菱")) {
+                effect = "【事業與正財】對應心輪，緩解壓力，帶來工作上的機遇與正財運。";
+            } else if (name.includes("藍") || name.includes("青") || name.includes("海藍") || name.includes("天河") || name.includes("拉利瑪") || name.includes("堇青") || name.includes("磷灰") || name.includes("藍晶")) {
                 effect = "【溝通與平靜】對應喉輪，提升表達能力，讓情緒如海洋般平靜，減少爭執。";
             } else if (name.includes("螢石")) {
                 effect = "【天才之石】幫助清理混亂思緒，提升學習力與創意，穩定情緒波動。";
@@ -149,10 +237,16 @@
                 effect = "【溫柔與修復】柔化性格，緩解急躁，修復氣場，適合需要放鬆與被療癒的人。";
             } else if (name.includes("超七") || name.includes("極光") || name.includes("阿魯沙")) {
                 effect = "【全方位能量】高頻水晶，同時對應多個脈輪，放大願望，招財、人緣、健康面面俱到。";
-            } else if (name.includes("兔毛")) {
-                effect = "【溫和療癒】細密的能量場，能調理氣血，帶來溫柔的保護與自信。";
             } else if (name.includes("斑彩")) {
                 effect = "【轉運招財】擁有七千萬年的能量，對應所有脈輪，能轉變運勢、招來財富。";
+            } else if (name.includes("琥珀") || name.includes("藍珀")) {
+                effect = "【安神定氣】佛教七寶之一，能安定心神，避邪保平安，適合敏感體質。";
+            } else if (name.includes("虎眼")) {
+                effect = "【勇氣與霸氣】王者之石，能激發勇氣，堅定信念，帶來像老虎般的行動力。";
+            } else if (name.includes("太陽石")) {
+                effect = "【正向陽光】如太陽般的能量，驅散憂鬱與負面思考，帶來快樂與活力。";
+            } else if (name.includes("藥王") || name.includes("鈦赫茲")) {
+                effect = "【健康與調理】對應身體健康，幫助氣血循環，排除體內負擔。";
             }
 
             return { effect, placement };
@@ -174,13 +268,13 @@
                 pool: [
                     "烏拉圭紫水晶", "紫水晶", "薰衣草紫晶", "夢幻紫晶", "紫晶共生方解石", 
                     "玻利維亞紫晶", "紫拉長石", "流沙紫鈦晶", "紫龍晶", "紫雲母",
-                    "喜瑪拉雅白水晶", "白水晶", "藍針白水晶", "阿賽斯特萊", "水膽水晶",
+                    "白阿賽斯特萊", "白水晶", "藍針白水晶", "阿賽斯特萊", "水膽水晶",
                     "拉長石", "藍拉長石", "拉利瑪", "月光石", "白月光", "馬島月光", "銀月光", "綠月光", "橙月光",
                     "天青石", "透石膏", "貴州氟鋁石膏", "魚眼石輝沸石", "印度沸石",
                     "葡萄石", "紫鋰輝", "藍紫鋰輝", "舒俱萊", "藥王石", 
-                    "糖果螢石", "羽毛螢石", "螢石", "紫螢石", "綠螢石", "藍螢石", "雙色螢石", "藍紋瑪瑙", "水草瑪瑙",
-                    "白兔毛", 
-                    "余太翠", "岫玉", "漢白玉"
+                    "糖果螢石", "羽毛螢石", "紫螢石", "綠螢石", "藍螢石", "藍紋瑪瑙", "水草瑪瑙",
+                    "白兔毛", "綠龍晶",
+                    "余太翠", "岫玉", "漢白玉", "九紫離火水晶"
                 ]
             },
             career: {
@@ -197,13 +291,14 @@
                 pool: [
                     "黃水晶", "檸檬黃水晶", "鈦晶", "金髮晶", "銅髮晶",
                     "黑金超七", "紫粉超七", "金草莓超七", "超級七", "彩色超七", 
-                    "極光23", "惡魔之眼極光23", "阿魯沙", "九紫離火水晶",
+                    "極光23", "惡魔之眼極光23", "阿魯沙", 
                     "綠幽靈", "四季幽靈", "藍幽靈", "綠幽共生雲母兔毛", "異象水晶", "巴西異象",
                     "太陽石", "金太陽", "金草莓太陽石", "黃銅礦", "斑彩石",
-                    "黃膠花", "牛血紅膠花", "紅膠花",
+                    "膠花", "牛血紅膠花",
                     "紅兔毛", "黃兔毛", "橘兔毛", "綠兔毛", "彩兔毛", "莫蘭迪色兔毛", "拉絲兔毛",
                     "碧璽", "老礦碧璽", "財寶舍利", "年輪魚子舍利", "釩鉛礦", "琥珀", "藍珀",
-                    "黃虎眼", "紅虎眼", "三色虎眼", "閃電虎眼", "彼得石", "黃螢石"
+                    "黃虎眼", "紅虎眼", "三色虎眼", "閃電虎眼", "彼得石", "黃螢石球", "異極礦柱", "異極礦球",
+                    "火焰石", "金運石"
                 ]
             },
             love: {
@@ -240,11 +335,11 @@
                 pool: [
                     "黑曜石", "彩虹黑曜石", "金曜石", "銀曜石", "雪花黑曜石", 
                     "黑髮晶", "黑碧璽", "金運石", 
-                    "茶水晶", "黑膽石", "阿拉善瑪瑙", "南紅瑪瑙", "紅瑪瑙", "纏絲紅瑪瑙",
+                    "茶水晶", "茶晶柱", "茶晶球", "黑膽石", "阿拉善瑪瑙", "南紅瑪瑙", "紅瑪瑙", "纏絲紅瑪瑙",
                     "青金石", "藍紋石", "白松虎眼",
                     "硃砂", "帝王硃砂", "天鐵", "瑞典天鐵", "鈦赫茲", 
                     "閃靈鑽", "水膽閃靈", "黑閃靈", "水膽水晶",
-                    "龍血石", "火焰石", "異極礦", "灰兔毛"
+                    "龍血石", "異極礦柱", "異極礦球", "灰兔毛", "琥珀", "藍珀"
                 ]
             }
         };
@@ -314,7 +409,8 @@
             <div className="flex flex-col items-center justify-center min-h-screen bg-pattern p-6 text-center animate-pop-in relative z-10">
                 <div className="bg-white/80 backdrop-blur-md p-8 rounded-3xl shadow-xl max-w-md w-full border border-white">
                     <div className="mb-6 flex justify-center text-[#967740]">
-                        <Sparkles size={64} />
+                        {/* New Hand-Drawn Moon Icon */}
+                        <MoonIconCustom size={72} />
                     </div>
                     <h1 className="text-3xl font-black text-[#5c4a28] mb-4 tracking-tight">
                         騏藝逸品<br/><span className="text-[#967740] text-2xl font-bold">靈魂狀態檢測</span>
