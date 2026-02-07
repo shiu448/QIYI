@@ -15,15 +15,15 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Custom Styles for Kahoot Vibes -->
+    <!-- Custom Styles -->
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
         
         body {
             font-family: 'Noto Sans TC', sans-serif;
-            background-color: #f4f1ea; /* 米杏色背景 */
+            background-color: #f4f1ea;
             overflow-x: hidden;
-            color: #5c4a28; /* 深棕色文字 */
+            color: #5c4a28;
         }
 
         /* 品牌金色定義 */
@@ -31,10 +31,6 @@
             --brand-gold: #967740;
             --brand-gold-dark: #7a6030;
         }
-
-        .text-brand-gold { color: #967740; }
-        .bg-brand-gold { background-color: #967740; }
-        .border-brand-gold { border-color: #967740; }
 
         .kahoot-btn {
             transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
@@ -63,12 +59,21 @@
         }
 
         .bg-pattern {
-            /* 淡雅的紋理背景 */
             background-color: #f4f1ea;
             background-image: radial-gradient(#d4c5a9 0.8px, transparent 0.8px), radial-gradient(#d4c5a9 0.8px, #f4f1ea 0.8px);
             background-size: 24px 24px;
             background-position: 0 0, 12px 12px;
         }
+
+        /* Modal Animation */
+        .modal-overlay {
+            animation: fadeIn 0.2s ease-out forwards;
+        }
+        .modal-content {
+            animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
     </style>
 </head>
 <body>
@@ -77,110 +82,143 @@
     <script type="text/babel">
         const { useState, useEffect } = React;
 
-        // --- Icons (Implemented as components to avoid CDN issues) ---
+        // --- Icons ---
         const Icon = ({ size = 24, className = "", children }) => (
-            <svg 
-                xmlns="http://www.w3.org/2000/svg" 
-                width={size} 
-                height={size} 
-                viewBox="0 0 24 24" 
-                fill="none" 
-                stroke="currentColor" 
-                strokeWidth="2" 
-                strokeLinecap="round" 
-                strokeLinejoin="round" 
-                className={className}
-            >
-                {children}
-            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>{children}</svg>
         );
+        const Sparkles = (props) => (<Icon {...props}><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L12 3Z" /></Icon>);
+        const Moon = (props) => (<Icon {...props}><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" /></Icon>);
+        const Zap = (props) => (<Icon {...props}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" /></Icon>);
+        const Heart = (props) => (<Icon {...props}><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" /></Icon>);
+        const Shield = (props) => (<Icon {...props}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" /></Icon>);
+        const Star = (props) => (<Icon {...props}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></Icon>);
+        const RefreshCw = (props) => (<Icon {...props}><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /><path d="M21 3v5h-5" /><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" /><path d="M8 16H3v5" /></Icon>);
+        const ArrowLeft = (props) => (<Icon {...props}><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></Icon>);
+        const Info = (props) => (<Icon {...props}><circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="12" /><line x1="12" y1="8" x2="12.01" y2="8" /></Icon>);
+        const X = (props) => (<Icon {...props}><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></Icon>);
 
-        const Sparkles = (props) => (
-            <Icon {...props}><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L12 3Z" /></Icon>
-        );
-        const Moon = (props) => (
-            <Icon {...props}><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" /></Icon>
-        );
-        const Zap = (props) => (
-            <Icon {...props}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" /></Icon>
-        );
-        const Heart = (props) => (
-            <Icon {...props}><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" /></Icon>
-        );
-        const Shield = (props) => (
-            <Icon {...props}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" /></Icon>
-        );
-        const Star = (props) => (
-            <Icon {...props}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></Icon>
-        );
-        const RefreshCw = (props) => (
-            <Icon {...props}>
-                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
-                <path d="M21 3v5h-5" />
-                <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
-                <path d="M8 16H3v5" />
-            </Icon>
-        );
-        const ArrowLeft = (props) => (
-            <Icon {...props}><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></Icon>
-        );
+        // --- Helper: Get Crystal Info by Name ---
+        const getCrystalInfo = (name) => {
+            let effect = "提供穩定的能量支持，幫助平衡身心狀態。";
+            let placement = "適合隨身佩戴，讓水晶能量時刻陪伴。";
+            let isOrnament = false;
+
+            // 1. Determine Shape/Placement first (Hierarchy: Specific Shapes -> General Ornaments -> Wearables)
+            if (name.includes("龍龜") || name.includes("貔貅") || name.includes("蟾蜍")) {
+                placement = "【招財神獸】建議將頭部朝向門口或窗外，以吸納財氣、鎮宅化煞。";
+                isOrnament = true;
+            } else if (name.includes("晶鎮") || name.includes("晶洞") || name.includes("錢袋") || name.includes("樹") || name.includes("聚寶盆")) {
+                placement = "【聚氣納財】適合擺放於家中財位（進門對角線45度角）或辦公桌上。";
+                isOrnament = true;
+            } else if (name.includes("球") || name.includes("蛋")) {
+                placement = "【圓滿和諧】適合擺放於辦公桌（象徵圓融）或客廳顯眼處，有求必應。";
+                isOrnament = true;
+            } else if (name.includes("柱") || name.includes("塔") || name.includes("金字塔")) {
+                placement = "【發射能量】適合放在辦公桌左前方（青龍方）或書桌，幫助集中精神與突破。";
+                isOrnament = true;
+            } else if (name.includes("盤") || name.includes("磚") || name.includes("原礦") || name.includes("擺件") || name.includes("畫框")) {
+                placement = "【能量淨化】適合放置飾品進行消磁，或置於床頭/書桌作為能量擺件。";
+                isOrnament = true;
+            } else if (name.includes("愛心")) {
+                 placement = "【情感流動】適合放在床頭櫃或梳妝台，增進感情與自我療癒。";
+                 isOrnament = true;
+            }
+
+            // 2. Determine Effect based on Keyword
+            if (name.includes("紫") || name.includes("薰衣草") || name.includes("阿梅")) {
+                effect = "【智慧與安定】對應頂輪，幫助大腦放鬆、提升睡眠品質，也能招來貴人運。";
+                if (isOrnament && !placement.includes("財位")) placement = "非常適合擺放在床頭（助眠）或書桌（專注）。";
+            } else if (name.includes("黃") || name.includes("鈦") || name.includes("金") || name.includes("琥珀") || name.includes("銅")) {
+                effect = "【財富與自信】對應太陽輪，增強自信心、行動力，主招正財與偏財。";
+                if (isOrnament) placement = "強烈建議擺放於財位（進門對角線45度角）或辦公桌。";
+            } else if (name.includes("粉") || name.includes("草莓") || name.includes("紅紋") || name.includes("薔薇") || name.includes("摩根")) {
+                effect = "【愛情與人緣】對應心輪，療癒情感創傷，增加個人魅力，招來好人緣與桃花。";
+            } else if (name.includes("黑") || name.includes("茶") || name.includes("墨") || name.includes("朱砂") || name.includes("鐵") || name.includes("膽")) {
+                effect = "【避邪與防護】對應海底輪，能吸收負能量、防小人，提供強大的安全感與結界。";
+                if (!isOrnament) placement = "建議佩戴於右手（排出負能量），或作為護身符。";
+                if (name.includes("朱砂")) effect += " (硃砂具有極強的鎮煞避邪傳統功效)";
+            } else if (name.includes("白") || name.includes("透") || name.includes("閃靈") || name.includes("阿賽")) {
+                effect = "【淨化與專注】能淨化磁場、清除雜念，提升專注力與直覺，放大其他水晶能量。";
+            } else if (name.includes("綠") || name.includes("幽靈") || name.includes("孔雀") || name.includes("捷克") || name.includes("葡萄") || name.includes("橄欖")) {
+                effect = "【事業與正財】對應心輪與事業，帶來工作上的機遇，幫助緩解壓力與焦慮。";
+            } else if (name.includes("藍") || name.includes("青") || name.includes("海藍") || name.includes("天河") || name.includes("拉利瑪")) {
+                effect = "【溝通與平靜】對應喉輪，提升表達能力，讓情緒如海洋般平靜，減少爭執。";
+            } else if (name.includes("螢石")) {
+                effect = "【天才之石】幫助清理混亂思緒，提升學習力與創意，穩定情緒波動。";
+            } else if (name.includes("月光") || name.includes("拉長")) {
+                effect = "【溫柔與修復】柔化性格，緩解急躁，修復氣場，適合需要放鬆與被療癒的人。";
+            } else if (name.includes("超七") || name.includes("極光") || name.includes("阿魯沙")) {
+                effect = "【全方位能量】高頻水晶，同時對應多個脈輪，放大願望，招財、人緣、健康面面俱到。";
+            } else if (name.includes("兔毛")) {
+                effect = "【溫和療癒】細密的能量場，能調理氣血，帶來溫柔的保護與自信。";
+            } else if (name.includes("斑彩")) {
+                effect = "【轉運招財】擁有七千萬年的能量，對應所有脈輪，能轉變運勢、招來財富。";
+            }
+
+            return { effect, placement };
+        };
 
         // --- Data Definitions ---
-
         const sections = {
             rest: {
                 id: 1,
-                title: "第一區：我現在很累",
-                subtitle: "情緒安定・休息",
-                desc: "當生活把你消耗得很快，你需要的不是再多一點努力，而是一個可以暫時放下的地方。",
-                color: "bg-[#f3eafa] text-[#6b4c9a] border-[#e0d0f0]", // Soft Lavender
+                title: "我現在很累",
+                subtitle: "情緒安定 · 休息",
+                desc: "承認疲累，這是一個不需要再硬撐、可以暫時放下壓力的空間。",
+                psychology: "降防備與建立信任",
+                function: "陪伴性質：提供穩定的能量，陪你度過消耗快速的時期。",
+                target: "生活壓力大、感到被掏空、需要安穩入眠或放鬆的人。",
+                color: "bg-[#f3eafa] text-[#6b4c9a] border-[#e0d0f0]", 
                 accent: "bg-[#b39ddb]",
                 icon: <Moon size={40} />,
-                // 完整資料庫 - 休息/淨化/療癒 (紫、白、透明、溫柔系)
                 pool: [
-                    "烏拉圭帝王紫水晶", "紫水晶", "薰衣草紫晶", "夢幻紫晶", "紫晶簇", "紫晶方解", 
-                    "玻利維亞紫晶", "紫拉長石", "烏拉圭紫晶", "流沙紫鈦晶", "紫龍晶", "紫雲母",
-                    "喜瑪拉雅白水晶", "白水晶", "藍針白水晶", "阿賽斯特萊", "白阿賽水晶", "水膽水晶",
+                    "烏拉圭紫水晶", "紫水晶", "薰衣草紫晶", "夢幻紫晶", "紫晶共生方解石", 
+                    "玻利維亞紫晶", "紫拉長石", "流沙紫鈦晶", "紫龍晶", "紫雲母",
+                    "喜瑪拉雅白水晶", "白水晶", "藍針白水晶", "阿賽斯特萊", "水膽水晶",
                     "拉長石", "藍拉長石", "拉利瑪", "月光石", "白月光", "馬島月光", "銀月光", "綠月光", "橙月光",
                     "天青石", "透石膏", "貴州氟鋁石膏", "魚眼石輝沸石", "印度沸石",
-                    "葡萄石", "紫鋰輝", "藍紫鋰輝", "櫻花舒俱萊", "舒俱萊", "藥王石", 
-                    "七彩螢石", "羽毛螢石", "糖果螢石", "紫螢石", "綠螢石", "藍螢石", "雙色螢石", "藍紋瑪瑙",
-                    "閃靈鑽", "水膽閃靈", "白兔毛", 
+                    "葡萄石", "紫鋰輝", "藍紫鋰輝", "舒俱萊", "藥王石", 
+                    "糖果螢石", "羽毛螢石", "螢石", "紫螢石", "綠螢石", "藍螢石", "雙色螢石", "藍紋瑪瑙", "水草瑪瑙",
+                    "白兔毛", 
                     "余太翠", "岫玉", "漢白玉"
                 ]
             },
             career: {
                 id: 2,
-                title: "第二區：我想往前走",
-                subtitle: "行動力・事業・轉換",
-                desc: "卡住的時候，不是方向錯，而是能量不夠。當你願意跨出第一步，事情才會開始流動。",
-                color: "bg-[#fff8e1] text-[#8d6e3f] border-[#faeabb]", // Soft Cream/Yellow
+                title: "我想往前走",
+                subtitle: "行動力 · 事業 · 轉換",
+                desc: "解決「卡住」的感覺。不是方向錯誤，而是「能量不足」導致無法跨出第一步。",
+                psychology: "引導需求並突破現狀",
+                function: "啟動性質：賦予「願意動起來」的推動力與流動感。",
+                target: "面臨職涯轉換、缺乏執行力、想要突破現狀的行動者。",
+                color: "bg-[#fff8e1] text-[#8d6e3f] border-[#faeabb]", 
                 accent: "bg-[#ffe082]",
                 icon: <Zap size={40} />,
-                // 完整資料庫 - 事業/招財/行動力 (黃、金、紅、高頻系)
                 pool: [
-                    "黃水晶", "檸檬黃阿賽", "鈦晶", "咖啡鈦晶", "金髮晶", "銅髮晶",
+                    "黃水晶", "檸檬黃水晶", "鈦晶", "金髮晶", "銅髮晶",
                     "黑金超七", "紫粉超七", "金草莓超七", "超級七", "彩色超七", 
                     "極光23", "惡魔之眼極光23", "阿魯沙", "九紫離火水晶",
                     "綠幽靈", "四季幽靈", "藍幽靈", "綠幽共生雲母兔毛", "異象水晶", "巴西異象",
                     "太陽石", "金太陽", "金草莓太陽石", "黃銅礦", "斑彩石",
                     "黃膠花", "牛血紅膠花", "紅膠花",
-                    "紅兔毛", "黃兔毛", "橘兔毛", "綠兔毛", "彩兔毛", "莫蘭迪色兔毛",
+                    "紅兔毛", "黃兔毛", "橘兔毛", "綠兔毛", "彩兔毛", "莫蘭迪色兔毛", "拉絲兔毛",
                     "碧璽", "老礦碧璽", "財寶舍利", "年輪魚子舍利", "釩鉛礦", "琥珀", "藍珀",
                     "黃虎眼", "紅虎眼", "三色虎眼", "閃電虎眼", "彼得石", "黃螢石"
                 ]
             },
             love: {
                 id: 3,
-                title: "第三區：我需要好好相處",
-                subtitle: "人際・感情・溝通",
-                desc: "在關係裡，你不需要委屈自己。你只需要被聽懂、被理解。",
-                color: "bg-[#fce4ec] text-[#ad4b76] border-[#f8bbd0]", // Soft Rose
+                title: "我需要好好相處",
+                subtitle: "人際 · 感情 · 溝通",
+                desc: "拒絕委屈與討好。核心在於追求「說話不累」以及在關係中「被理解」的渴望。",
+                psychology: "加購與關係延伸需求",
+                function: "表達性質：讓你有勇氣與安全感去表達真實的自己。",
+                target: "處理人際壓力、感情瓶頸、對外溝通感到吃力的人。",
+                color: "bg-[#fce4ec] text-[#ad4b76] border-[#f8bbd0]", 
                 accent: "bg-[#f48fb1]",
                 icon: <Heart size={40} />,
-                // 完整資料庫 - 愛情/人緣/溝通 (粉、紅、藍、青系)
                 pool: [
-                    "粉水晶", "馬粉", "雲霧粉水晶", "西柚粉晶", "六芒星粉晶",
+                    "粉水晶", "馬粉", "雲霧粉水晶", "六芒星粉晶",
                     "草莓晶", "綠草莓晶", "金草莓半盆超七", "薔薇輝石", "玉化紅紋石", "摩根石",
                     "海藍寶", "魔鬼海藍寶", "海藍寶共生方解石", "藍玉髓",
                     "藍晶石", "天河石", "彩天河石", "藍磷灰", "矽孔雀石藍銅礦", "孔雀石", "綠孔雀石",
@@ -190,20 +228,23 @@
             },
             protect: {
                 id: 4,
-                title: "第四區：我想保護自己",
-                subtitle: "界線・防護・穩定",
-                desc: "當外界太吵、情緒太多，為自己留下一點空間，是一種溫柔的保護。",
-                color: "bg-[#eff1f3] text-[#546e7a] border-[#cfd8dc]", // Soft Blue-Grey
+                title: "我想保護自己",
+                subtitle: "界線 · 防護 · 穩定",
+                desc: "正名化「敏感」。告訴自己敏感並非缺點，而是缺乏界線的保護。",
+                psychology: "穩定的結尾與安全感",
+                function: "防禦性質：為自己創造一個緩衝空間，幫助自己先站穩腳跟。",
+                target: "易受他人情緒影響、高壓吵雜環境工作、需要高度安全感的人。",
+                color: "bg-[#eff1f3] text-[#546e7a] border-[#cfd8dc]", 
                 accent: "bg-[#90a4ae]",
                 icon: <Shield size={40} />,
-                // 完整資料庫 - 避邪/防護/穩定 (黑、深藍、落地系)
                 pool: [
                     "黑曜石", "彩虹黑曜石", "金曜石", "銀曜石", "雪花黑曜石", 
                     "黑髮晶", "黑碧璽", "金運石", 
                     "茶水晶", "黑膽石", "阿拉善瑪瑙", "南紅瑪瑙", "紅瑪瑙", "纏絲紅瑪瑙",
-                    "青金石", "藍紋石", 
+                    "青金石", "藍紋石", "白松虎眼",
                     "硃砂", "帝王硃砂", "天鐵", "瑞典天鐵", "鈦赫茲", 
-                    "黑閃靈", "龍血石", "火焰石", "異極礦", "灰兔毛"
+                    "閃靈鑽", "水膽閃靈", "黑閃靈", "水膽水晶",
+                    "龍血石", "火焰石", "異極礦", "灰兔毛"
                 ]
             }
         };
@@ -214,12 +255,12 @@
                 question: "STEP 1｜閉上眼睛深呼吸... 你現在最想調整的狀態是？",
                 type: "poll",
                 options: [
-                    { text: "焦慮、腦袋停不下來", type: "rest", color: "bg-[#dcb5ac]" }, // Dusty Rose
-                    { text: "睡不好、容易累", type: "rest", color: "bg-[#a6b6c3]" }, // Dusty Blue
-                    { text: "人際或感情很消耗", type: "love", color: "bg-[#dfcc9f]" }, // Sand/Gold
-                    { text: "事業卡關 / 金錢壓力", type: "career", color: "bg-[#aebfa1]" } // Sage Green
+                    { text: "焦慮、腦袋停不下來", type: "rest", color: "bg-[#dcb5ac]" },
+                    { text: "睡不好、容易累", type: "rest", color: "bg-[#a6b6c3]" },
+                    { text: "人際或感情很消耗", type: "love", color: "bg-[#dfcc9f]" },
+                    { text: "事業卡關 / 金錢壓力", type: "career", color: "bg-[#aebfa1]" }
                 ],
-                extraOption: { text: "容易被外界影響、磁場亂", type: "protect", color: "bg-[#b7b0a8]" } // Warm Grey
+                extraOption: { text: "容易被外界影響、磁場亂", type: "protect", color: "bg-[#b7b0a8]" }
             },
             {
                 step: 2,
@@ -299,9 +340,7 @@
 
             return (
                 <div className="flex flex-col min-h-screen bg-[#f4f1ea] text-[#5c4a28]">
-                    {/* Header Bar */}
                     <div className="flex justify-between items-center p-4 relative">
-                        {/* Back Button */}
                         <button 
                             onClick={onBack}
                             className="p-2 rounded-full hover:bg-[#e4dac6] transition-colors text-[#967740] flex items-center gap-1"
@@ -313,19 +352,15 @@
                         <div className="bg-[#e4dac6] text-[#967740] px-4 py-1 rounded-full text-sm font-bold absolute left-1/2 transform -translate-x-1/2">
                             {currentStep} / {totalSteps}
                         </div>
-                        
-                        {/* Spacer */}
                         <div className="w-10"></div> 
                     </div>
 
-                    {/* Question Area */}
                     <div className="flex-1 flex items-center justify-center p-6 text-center">
                         <div className="bg-white p-8 rounded-2xl shadow-sm max-w-2xl w-full border border-[#e8dfcc] animate-pop-in">
                             <h2 className="text-2xl md:text-3xl font-bold text-[#5c4a28] tracking-wide leading-relaxed">{questionData.question}</h2>
                         </div>
                     </div>
 
-                    {/* Options Area (Kahoot Style Grid but softer) */}
                     <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4 pb-8 max-w-4xl mx-auto w-full">
                         {displayOptions.map((opt, idx) => (
                             <button
@@ -353,25 +388,69 @@
             );
         };
 
+        const ItemModal = ({ item, onClose }) => {
+            if (!item) return null;
+            const info = getCrystalInfo(item);
+
+            return (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 modal-overlay">
+                    <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose}></div>
+                    <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full relative z-10 overflow-hidden modal-content border-2 border-[#e8dfcc]">
+                        {/* Header */}
+                        <div className="bg-[#fcfbf9] p-6 border-b border-[#f0ebe0] flex justify-between items-center">
+                            <h3 className="text-2xl font-black text-[#5c4a28]">{item}</h3>
+                            <button onClick={onClose} className="text-gray-400 hover:text-[#967740] transition-colors p-1 rounded-full hover:bg-black/5">
+                                <X size={24} />
+                            </button>
+                        </div>
+                        
+                        {/* Body */}
+                        <div className="p-6 space-y-6">
+                            <div>
+                                <h4 className="flex items-center gap-2 text-[#967740] font-bold text-lg mb-2">
+                                    <Sparkles size={20} /> 能量功效
+                                </h4>
+                                <p className="text-[#5c4a28] leading-relaxed bg-[#f4f1ea] p-4 rounded-xl border border-[#e8dfcc]">
+                                    {info.effect}
+                                </p>
+                            </div>
+
+                            <div>
+                                <h4 className="flex items-center gap-2 text-[#967740] font-bold text-lg mb-2">
+                                    <Shield size={20} /> 建議擺放 / 使用方式
+                                </h4>
+                                <p className="text-[#5c4a28] leading-relaxed bg-[#f4f1ea] p-4 rounded-xl border border-[#e8dfcc]">
+                                    {info.placement}
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Footer */}
+                        <div className="p-4 bg-[#fcfbf9] border-t border-[#f0ebe0] text-center">
+                            <button onClick={onClose} className="w-full bg-[#967740] text-white font-bold py-3 rounded-xl hover:bg-[#856730] transition-colors">
+                                了解，謝謝！
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
         const ResultScreen = ({ result, userSelections, onRestart }) => {
             const sectionData = sections[result];
             const [recommendations, setRecommendations] = useState([]);
+            const [selectedItem, setSelectedItem] = useState(null);
 
-            // Randomly select 5 items on mount
             useEffect(() => {
                 const pool = sectionData.pool;
                 if (pool && pool.length > 0) {
-                    // Shuffle array
                     const shuffled = [...pool].sort(() => 0.5 - Math.random());
-                    // Pick first 5
                     setRecommendations(shuffled.slice(0, 5));
                 }
-            }, [result]); // Re-run if result changes (though component usually unmounts)
+            }, [result]);
 
-            // Determine intensity
             const intensity = userSelections.q2_score >= 2 ? "能量急需補充" : "能量微調保養";
             
-            // Get Budget/Determination
             const budgetMap = {
                 "680": "入門 ($680)",
                 "980": "進階 ($980)",
@@ -382,21 +461,27 @@
 
             return (
                 <div className="min-h-screen bg-[#f4f1ea] p-4 md:p-8 flex items-center justify-center">
-                    <div className="max-w-4xl w-full bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col md:flex-row animate-pop-in border border-[#e8dfcc]">
+                    {selectedItem && <ItemModal item={selectedItem} onClose={() => setSelectedItem(null)} />}
+                    
+                    <div className="max-w-5xl w-full bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col md:flex-row animate-pop-in border border-[#e8dfcc]">
                         
                         {/* Left Side: Result Card */}
                         <div className={`md:w-5/12 p-8 flex flex-col justify-between relative overflow-hidden ${sectionData.color}`}>
-                            
                             <div className="relative z-10">
-                                <div className="inline-block px-3 py-1 bg-white/50 rounded-full text-xs font-bold mb-4 tracking-widest uppercase opacity-80">
+                                <div className="inline-block px-3 py-1 bg-white/50 rounded-full text-sm font-bold mb-4 tracking-widest uppercase opacity-80">
                                     Your Energy Analysis
                                 </div>
-                                <h2 className="text-4xl font-black mb-2 tracking-tight">{sectionData.title}</h2>
-                                <h3 className="text-xl font-bold opacity-80 mb-6">{sectionData.subtitle}</h3>
-                                <div className="bg-white/40 p-4 rounded-xl backdrop-blur-sm border border-white/40 mb-6">
-                                    <p className="text-sm leading-relaxed font-medium opacity-90">
+                                <h2 className="text-4xl md:text-5xl font-black mb-2 tracking-tight">{sectionData.title}</h2>
+                                <h3 className="text-xl md:text-2xl font-bold opacity-80 mb-6">{sectionData.subtitle}</h3>
+                                
+                                <div className="bg-white/40 p-4 rounded-xl backdrop-blur-sm border border-white/40 mb-4">
+                                    <p className="text-lg leading-relaxed font-bold opacity-90 mb-2">
                                         "{sectionData.desc}"
                                     </p>
+                                    <div className="text-sm opacity-80 mt-2 pt-2 border-t border-white/30">
+                                        <p className="mb-1"><span className="font-bold">心理訴求：</span>{sectionData.psychology}</p>
+                                        <p><span className="font-bold">水晶功能：</span>{sectionData.function}</p>
+                                    </div>
                                 </div>
                             </div>
                             
@@ -404,55 +489,72 @@
                                 <div className={`bg-white p-4 rounded-full inline-block shadow-sm mb-2 text-[#967740]`}>
                                     {sectionData.icon}
                                 </div>
-                                <div className="font-bold text-lg opacity-80">檢測結果</div>
+                                <div className="font-bold text-xl opacity-80">檢測結果</div>
                             </div>
                         </div>
 
                         {/* Right Side: Details & Action */}
                         <div className="md:w-7/12 p-8 bg-white text-[#5c4a28] flex flex-col">
                             
-                            {/* Consultant Note (Top Info) */}
-                            <div className="bg-[#fcfbf9] rounded-xl p-4 mb-6 border border-[#e8dfcc]">
-                                <h4 className="text-xs font-bold text-[#967740] uppercase tracking-wide mb-2">顧問參考資訊</h4>
+                            <div className="bg-[#fcfbf9] rounded-xl p-5 mb-6 border border-[#e8dfcc]">
+                                <h4 className="text-sm font-bold text-[#967740] uppercase tracking-wide mb-3">顧問參考資訊</h4>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <span className="block text-xs text-gray-400">當前狀態強度</span>
-                                        <span className={`block font-bold ${userSelections.q2_score >= 2 ? 'text-[#dcb5ac]' : 'text-[#a6b6c3]'}`}>
-                                            {intensity}
+                                        <span className="block text-sm text-gray-400">適用對象</span>
+                                        <span className="block text-sm font-bold text-[#5c4a28] leading-tight mt-1">
+                                            {sectionData.target}
                                         </span>
                                     </div>
-                                    <div>
-                                        <span className="block text-xs text-gray-400">期望調整方案</span>
-                                        <span className="block font-bold text-[#967740]">{userBudget}</span>
+                                    <div className="flex flex-col justify-between">
+                                        <div>
+                                            <span className="block text-sm text-gray-400">強度/預算</span>
+                                            <span className={`block text-lg font-bold ${userSelections.q2_score >= 2 ? 'text-[#dcb5ac]' : 'text-[#a6b6c3]'}`}>
+                                                {intensity} / {userBudget}
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
-                            {/* Recommendations (Random 5) */}
                             <div className="flex-1">
-                                <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-[#5c4a28]">
-                                    <Star className="text-[#dfcc9f]" size={20}/> 專屬推薦水晶
-                                </h3>
+                                <div className="flex justify-between items-center mb-4">
+                                    <h3 className="text-2xl font-bold flex items-center gap-2 text-[#5c4a28]">
+                                        <Star className="text-[#dfcc9f]" size={24}/> 專屬推薦水晶
+                                    </h3>
+                                    <span className="text-xs text-gray-400 font-normal flex items-center gap-1">
+                                        <Info size={14}/> 點擊品項查看功效
+                                    </span>
+                                </div>
+                                
                                 <ul className="space-y-3 mb-8">
                                     {recommendations.map((prod, idx) => (
-                                        <li key={idx} className="flex items-start gap-3 p-3 rounded-lg hover:bg-[#f9f7f2] transition-colors border border-transparent hover:border-[#e8dfcc] animate-pop-in" style={{animationDelay: `${idx * 0.1}s`}}>
-                                            <div className={`mt-1 w-2 h-2 rounded-full shrink-0 ${sectionData.accent}`}></div>
-                                            <span className="font-medium text-[#7d6745]">{prod}</span>
+                                        <li 
+                                            key={idx} 
+                                            onClick={() => setSelectedItem(prod)}
+                                            className="flex items-center justify-between gap-3 p-4 rounded-xl bg-[#f9f7f2] hover:bg-[#efeadd] transition-all cursor-pointer border border-transparent hover:border-[#e8dfcc] group animate-pop-in shadow-sm hover:shadow-md" 
+                                            style={{animationDelay: `${idx * 0.1}s`}}
+                                        >
+                                            <div className="flex items-center gap-3">
+                                                <div className={`w-3 h-3 rounded-full shrink-0 ${sectionData.accent} group-hover:scale-110 transition-transform`}></div>
+                                                <span className="text-lg font-bold text-[#7d6745] group-hover:text-[#5c4a28]">{prod}</span>
+                                            </div>
+                                            <Icon className="text-[#d4c5a9] group-hover:text-[#967740]" size={20}>
+                                                <circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="12" /><line x1="12" y1="8" x2="12.01" y2="8" />
+                                            </Icon>
                                         </li>
                                     ))}
                                 </ul>
                             </div>
 
-                            {/* CTA Button */}
                             <div className="mt-auto pt-4 border-t border-gray-100">
-                                <p className="text-center text-sm text-[#b0a286] mb-4">
+                                <p className="text-center text-base text-[#b0a286] mb-4">
                                     請將此畫面出示給現場顧問，我們將引導您前往該區域。
                                 </p>
                                 <button 
                                     onClick={onRestart}
-                                    className="w-full flex items-center justify-center gap-2 bg-[#967740] text-white font-bold py-3 rounded-xl hover:bg-[#856730] transition-colors shadow-md"
+                                    className="w-full flex items-center justify-center gap-2 bg-[#967740] text-white text-xl font-bold py-4 rounded-xl hover:bg-[#856730] transition-colors shadow-md"
                                 >
-                                    <RefreshCw size={18} /> 重新測驗
+                                    <RefreshCw size={20} /> 重新測驗
                                 </button>
                             </div>
                         </div>
@@ -461,15 +563,13 @@
             );
         };
 
-        // --- Main App Logic ---
-
         const App = () => {
-            const [screen, setScreen] = useState('welcome'); // welcome, quiz, result
+            const [screen, setScreen] = useState('welcome');
             const [currentQIndex, setCurrentQIndex] = useState(0);
             const [answers, setAnswers] = useState({
-                mainType: null, // From Q1
+                mainType: null,
                 q2_score: 0,
-                desiredType: null, // From Q3
+                desiredType: null,
                 habit: null,
                 budget: null
             });
@@ -480,13 +580,10 @@
                 setAnswers({ mainType: null, q2_score: 0, desiredType: null, habit: null, budget: null });
             };
 
-            // Back Handler
             const handleBack = () => {
                 if (currentQIndex > 0) {
-                    // Go back to previous question
                     setCurrentQIndex(prev => prev - 1);
                 } else {
-                    // Go back to welcome screen if on first question
                     setScreen('welcome');
                 }
             };
